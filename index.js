@@ -1,28 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 const App = () => {
   const [fields, setFields] = useState([]);
   const [formData, setFormData] = useState([]);
 
-  useEffect(() => {
-    // Load form data from local storage when the component mounts
-    const savedFormData = JSON.parse(localStorage.getItem('formData')) || [];
-    setFormData(savedFormData);
-    // Load fields from local storage
-    const savedFields = JSON.parse(localStorage.getItem('fields')) || [];
-    setFields(savedFields);
-  }, []);
-
-  useEffect(() => {
-    // Save fields and formData to local storage whenever they change
-    localStorage.setItem('fields', JSON.stringify(fields));
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [fields, formData]);
-
   const addField = () => {
-    const newField = { id: Date.now(), value: '' };
-    setFields([...fields, newField]);
+    setFields([...fields, { id: Date.now(), value: '' }]);
   };
 
   const removeField = (id) => {
@@ -36,8 +20,7 @@ const App = () => {
 
   const saveFields = (id) => {
     const fieldToSave = fields.find(field => field.id === id);
-    const updatedFormData = [...formData.filter(data => data.id !== id), fieldToSave];
-    setFormData(updatedFormData);
+    setFormData([...formData.filter(data => data.id !== id), fieldToSave]);
   };
 
   return (
@@ -46,6 +29,7 @@ const App = () => {
       <div className="form-container">
         {fields.map(field => (
           <div key={field.id} className="field-wrapper">
+            <button className="remove-button" onClick={() => removeField(field.id)}>Remove</button>
             <div className="field-container">
               <input
                 type="text"
@@ -54,15 +38,11 @@ const App = () => {
                 placeholder={`Field ${field.id}`}
               />
               <button className="save-button" onClick={() => saveFields(field.id)}>Save</button>
-              <button className="add-field-button" onClick={addField}>Add Field</button>
             </div>
-            <button className="remove-button" onClick={() => removeField(field.id)}>Remove</button>
           </div>
         ))}
-        <div className="add-field-container">
-          <button className="add-field-button" onClick={addField}>Add Field</button>
-        </div>
       </div>
+      <button className="add-field-button" onClick={addField}>Add Field</button>
       <div className="output">
         <h2>Saved Data</h2>
         {formData.length > 0 ? (
@@ -71,7 +51,6 @@ const App = () => {
               <p>ID: {item.id}</p>
               <p>Value: {item.value}</p>
               <p>Index: {index}</p>
-              {/* Removed Address display */}
             </div>
           ))
         ) : (
